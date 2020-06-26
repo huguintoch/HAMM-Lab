@@ -21,11 +21,19 @@ public class Grid : MonoBehaviour {
     }
 
     private void Update() {
-        if(Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit)) {
                 hit.collider.gameObject.GetComponent<GridCell>().InstantiateObject(hit.normal);
+            }
+        } else if (Input.GetMouseButtonDown(1)) {
+            RaycastHit hit;
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit)) {
+                if (hit.collider.tag != "Grid") {
+                    Destroy(hit.collider.gameObject);
+                }
             }
         }
     }
