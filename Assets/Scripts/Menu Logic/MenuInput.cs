@@ -10,6 +10,8 @@ public class MenuInput : MonoBehaviour {
     private Camera cam;
     private Vector2 dragOrigin;
 
+    public float camInitialY;
+
     private bool dragging;
 
     private void Awake() {
@@ -44,8 +46,8 @@ public class MenuInput : MonoBehaviour {
             Vector3 move = new Vector3(0, -pos.y * dragSpeed,0);
             cam.transform.Translate(move);
 
-            if (cam.transform.position.y < 10) {
-                cam.transform.position = new Vector3(0, 10, 0);
+            if (cam.transform.position.y < camInitialY) {
+                cam.transform.position = new Vector3(0, camInitialY, 0);
             }
         }
 
@@ -53,5 +55,4 @@ public class MenuInput : MonoBehaviour {
             dragging = false;
         }
     }
-
 }
