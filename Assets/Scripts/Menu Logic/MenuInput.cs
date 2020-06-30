@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MenuInput : MonoBehaviour
-{
+public class MenuInput : MonoBehaviour {
     [SerializeField]
     private float dragSpeed=1;
 
@@ -12,7 +11,6 @@ public class MenuInput : MonoBehaviour
     private Vector2 dragOrigin;
 
     private bool dragging;
-
 
     private void Awake() {
         menuRaise = GameObject.Find("GameManager").GetComponent<MenuRaiseUp>();
@@ -55,4 +53,5 @@ public class MenuInput : MonoBehaviour
             dragging = false;
         }
     }
+
 }
