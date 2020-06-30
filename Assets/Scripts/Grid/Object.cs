@@ -2,4 +2,4 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Object : GridCell { }
+public class Object : GridElement { }
