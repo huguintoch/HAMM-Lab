@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5245349850614822361}
   - component: {fileID: 143204845220822628}
+  - component: {fileID: 4098307845687582828}
   m_Layer: 0
   m_Name: Treadmill
   m_TagString: Untagged
@@ -25,8 +26,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 75719478759282249}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7025919, y: -2.1366682, z: 4.0511055}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.7025919, y: 0, z: 4.0511055}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children:
   - {fileID: 6781563467523328272}
   - {fileID: 5391993699582680976}
@@ -46,6 +47,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 5.497746, y: 2.1209583, z: 2.2256694}
   m_Center: {x: -0.6055939, y: -0.8441191, z: -1.0472438}
+--- !u!114 &4098307845687582828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75719478759282249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae5a022af6d9955489263f3e6c942be1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5018135527858108022
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class Grid : MonoBehaviour {
@@ -7,41 +8,87 @@ public class Grid : MonoBehaviour {
     [SerializeField]
     private int gridSize = 4;
     [SerializeField]
-    private GameObject cameraContainer;
+    private GameObject cameraContainer = null;
 
     private GameObject cubePrefab;
     private Camera mainCamera;
-    private int offset;
+    private int offset,
+                type;
 
     private void Start() {
-        mainCamera = Camera.main;
+        // Definition of attributes
         cubePrefab = (GameObject)Resources.Load("Prefabs/GridCell", typeof(GameObject));
-        for(int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
-                Instantiate(cubePrefab, new Vector3(i, 0, j), Quaternion.identity, this.transform);
-            }
-        }
-        cameraContainer.transform.position = (gridSize % 2 == 0) ? new Vector3(gridSize/2-0.5f, 0, gridSize/2f-0.5f) : new Vector3(Mathf.Floor(gridSize / 2), 0, Mathf.Floor(gridSize / 2));
-
+        mainCamera = Camera.main;
         offset = gridSize + 1;
-        mainCamera.transform.position = new Vector3(gridSize+offset, offset, gridSize+offset);
-        mainCamera.transform.rotation = Quaternion.Euler(25, 225, 0);
+        type = 1;
+
+        // Initial setups
+        InitializeCamera();
+        InitializeGrid();
     }
 
     private void Update() {
         if (Input.GetMouseButtonDown(0)) {
-            RaycastHit hit;
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit)) {
-                hit.collider.gameObject.GetComponent<GridElement>().InstantiateObject(hit.normal);
-            }
+            AddGridElement();
         } else if (Input.GetMouseButtonDown(1)) {
-            RaycastHit hit;
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit)) {
-                if (hit.collider.tag != "Grid") {
-                    Destroy(hit.collider.gameObject);
-                }
+            RemoveGridElement();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            type = 1;
+        } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            type = 2;
+        } else if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            type = 3;
+        }
+    }
+
+    // Method to initialize camera position
+    private void InitializeCamera() {
+        cameraContainer.transform.position = (gridSize % 2 == 0) ? new Vector3(gridSize / 2 - 0.5f, 0, gridSize / 2f - 0.5f) : new Vector3(Mathf.Floor(gridSize / 2), 0, Mathf.Floor(gridSize / 2));
+        mainCamera.transform.position = new Vector3(gridSize + offset, offset, gridSize + offset);
+        mainCamera.transform.rotation = Quaternion.Euler(25, 225, 0);
+    }
+
+    // Method to build the grid on which elements are placed
+    private void InitializeGrid() {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                Instantiate(cubePrefab, new Vector3(i, 0, j), Quaternion.identity, this.transform);
+            }
+        }
+    }
+
+    // Method to dinamically place element on grid depending on type selected
+    private void AddGridElement() {
+        RaycastHit hit;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit)) {
+            string path = "";
+            switch (type) {
+                case 1:
+                    path = "Prefabs/Object";
+                    break;
+                case 2:
+                    path = "Prefabs/Treadmill Model/Treadmill";
+                    break;
+                case 3:
+                    path = "Prefabs/Hamster";
+                    break;
+                default:
+                    path = "Prefabs/Object";
+                    break;
+            }
+            Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
+        }
+    }
+
+    // Method to remove element from grid by alt-cliking it
+    private void RemoveGridElement() {
+        RaycastHit hit;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit)) {
+            if (hit.collider.tag != "Grid") {
+                Destroy(hit.collider.gameObject);
             }
         }
     }
