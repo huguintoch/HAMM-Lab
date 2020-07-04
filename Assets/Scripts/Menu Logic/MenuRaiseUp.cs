@@ -50,7 +50,7 @@ public class MenuRaiseUp : MonoBehaviour {
             if (compContainer.localPosition.y - initialHeight >= rectCanvas.sizeDelta.y+20) {
                 hidingMenu = false;
                 menuActive = false;
-                Debug.Log("Hidden Menu");
+                //Debug.Log("Hidden Menu");
             }
         } else if (showingMenu) {
             MoveCanvasObejcts(-1);
@@ -61,7 +61,7 @@ public class MenuRaiseUp : MonoBehaviour {
                 buttonExit.interactable = true;
                 menuActive = true;
                 showingMenu = false;
-                Debug.Log("Show Menu");
+                //Debug.Log("Show Menu");
             }
         }
     }

@@ -24,6 +24,8 @@ public class Grid : MonoBehaviour {
         // Initial setups
         InitializeCamera();
         InitializeGrid();
+        InitializeCamera();
+        
     }
 
     private void Update() {
@@ -36,11 +38,36 @@ public class Grid : MonoBehaviour {
 
     // Method to build the grid on which elements are placed
     private void InitializeGrid() {
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
-                Instantiate(cubePrefab, new Vector3(i, 0, j), Quaternion.identity, this.transform);
+        int currentLevel = LevelsInfo.currentLevel;
+        gridSize = LevelsInfo.grids[currentLevel].GetLength(0);
+        
+        float prefabHeight = cubePrefab.transform.localScale.y;
+        bool goalReady = false,
+             playerReady = false;
+        for (int i = 0; i < LevelsInfo.grids[currentLevel].GetLength(0); i++) {
+            for (int j = 0; j < LevelsInfo.grids[currentLevel].GetLength(1); j++) {
+                int tileHeight = LevelsInfo.grids[currentLevel][i, j];
+                GameObject tileToSpawn = cubePrefab;
+
+                if (!goalReady && tileHeight < 0) { //Goal Tile
+                    //tileToSpawn = goalPrefab;
+                    tileHeight *= -1;
+                    goalReady = true;
+                }else if (!playerReady && tileHeight > 50) { //Player Position
+                    //*** Missing logic to spawn player with initial speed. ***
+                    tileHeight = tileHeight - 50;
+                    playerReady = true;
+                }
+
+                if (tileHeight != 0) { //Spawn floor in tile;
+                    GameObject newCube = Instantiate(tileToSpawn, new Vector3(i, 0, j), Quaternion.identity, this.transform);
+                    newCube.transform.Translate(0, (tileHeight*prefabHeight) / 2, 0);
+                    newCube.transform.localScale = new Vector3(1, tileHeight * prefabHeight, 1);
+                }
+
             }
         }
+
     }
 
     // Method to initialize camera position

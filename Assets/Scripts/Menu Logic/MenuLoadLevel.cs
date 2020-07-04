@@ -7,11 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class MenuLoadLevel : MonoBehaviour
 {
-    private static GameObject GridCreator;
-
-    [SerializeField]
-    private int desiredGridSize=5;
-
     private int level;
 
     private void Awake() {
@@ -20,15 +15,11 @@ public class MenuLoadLevel : MonoBehaviour
         } catch (FormatException) {
             Debug.Log("The block number: " + GetComponentInChildren<TextMeshPro>().text + "couldn't be loaded.");
         }
-        if (!GridCreator) {
-            GridCreator = Instantiate((GameObject)Resources.Load("Prefabs/GridSizeAssigner", typeof(GameObject))) as GameObject;
-            DontDestroyOnLoad(GridCreator);
-        }
     }
 
     public void LoadLevel() {
-        GridCreator.GetComponent<GridSizeAssigner>().gridSize = desiredGridSize;
-        SceneManager.LoadScene("Grid");
+        LevelsInfo.currentLevel = (ushort)level;
+        SceneManager.LoadSceneAsync("Grid");
     }
         
 }
