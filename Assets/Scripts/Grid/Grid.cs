@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour {
 
-    public static Dictionary<Element, string> gridElements = new Dictionary<Element, string>();
 
     [SerializeField]
     private int gridSize = 4;
@@ -14,7 +13,6 @@ public class Grid : MonoBehaviour {
 
     private GameObject cubePrefab;
     private Camera mainCamera;
-    private Element type;
     private int offset;
 
     private void Start() {
@@ -22,10 +20,8 @@ public class Grid : MonoBehaviour {
         cubePrefab = (GameObject)Resources.Load("Prefabs/GridCell", typeof(GameObject));
         mainCamera = Camera.main;
         offset = gridSize + 1;
-        type = Element.Hamster;
 
         // Initial setups
-        InitializeDictionary();
         InitializeCamera();
         InitializeGrid();
     }
@@ -36,20 +32,6 @@ public class Grid : MonoBehaviour {
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            type = Element.Hamster;
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            type = Element.Treadmill;
-        } else if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            type = Element.Trampoline;
-        }
-    }
-
-    private void InitializeDictionary() {
-        gridElements.Add(Element.Hamster, "Prefabs/Hamster");
-        gridElements.Add(Element.Treadmill, "Prefabs/Treadmill Model/Treadmill");
-        gridElements.Add(Element.Trampoline, "Prefabs/Trampoline/Trampoline");
     }
 
     // Method to build the grid on which elements are placed
@@ -73,7 +55,7 @@ public class Grid : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
-            string path = gridElements[type];
+            string path = InvManager.instance.elements[InvManager.instance.getType()].getPath();
             Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
         }
     }
