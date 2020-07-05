@@ -169,6 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2bc35195aec8342a4e93d63eb5c0d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  money: 100
   objectDeclaration:
   - enumElement: 1
     price: 20

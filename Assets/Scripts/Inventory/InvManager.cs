@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class InvManager : MonoBehaviour
@@ -8,14 +9,22 @@ public class InvManager : MonoBehaviour
     public static InvManager instance;
 
     public Dictionary<Element, ItemValues> elements = new Dictionary<Element, ItemValues>();
-    public ItemValues[] objectDeclaration;
-   
+
+    [SerializeField]
+    private float money = 0f;
+    [SerializeField]
+    private ItemValues[] objectDeclaration;
+
     //Selected element
     private Element type;
 
     //GUI
-    private GameObject buttonPreset,background;
+    private GameObject buttonPreset,background,content,moneyPanel;
+    private TextMeshProUGUI moneyText;
+    private RectTransform rectBg;
     private Canvas canvas;
+
+    
 
     //Singleton
     private void Awake()
@@ -38,14 +47,20 @@ public class InvManager : MonoBehaviour
         //Get references for the GUI elements
         canvas = GameObject.FindObjectOfType<Canvas>();
         background = Instantiate((GameObject)Resources.Load("Prefabs/GUI/InvBackground", typeof(GameObject)),canvas.transform);
+        content = background.transform.Find("Scroll View").Find("Viewport").Find("Content").gameObject;
         buttonPreset = (GameObject)Resources.Load("Prefabs/GUI/InvItem", typeof(GameObject));
+        moneyPanel= Instantiate((GameObject)Resources.Load("Prefabs/GUI/MoneySign", typeof(GameObject)),canvas.transform);
+        rectBg = background.GetComponent<RectTransform>();
+        moneyText = moneyPanel.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>();
+        moneyText.text = "Money: $" + money;
 
         InitializeDictionary();
 
         DeclareObjects();
 
-        CreateButtons();
+        InitializeGUI();
     }
+
 
     //Declares values from the inspector
     private void DeclareObjects()
@@ -70,23 +85,63 @@ public class InvManager : MonoBehaviour
         elements.Add(Element.Trampoline, new ItemValues("Prefabs/Trampoline/Trampoline", "Images/GUI/Icon05"));
     }
 
-    //Creates buttons for each declared element
-    private void CreateButtons()
+    //Creates buttons for each declared element and assigns size to all GUI components
+    private void InitializeGUI()
     {
-        float space = -1.2f;
+        rectBg.sizeDelta = new Vector2(rectBg.sizeDelta.x, canvas.GetComponent<RectTransform>().sizeDelta.y / 5);
+
+        RectTransform rectCont = content.GetComponent<RectTransform>();
+        rectCont.sizeDelta = new Vector2(rectCont.sizeDelta.x,rectBg.sizeDelta.y * 0.6f);
+
+        RectTransform rectMoney = moneyPanel.GetComponent<RectTransform>();
+        rectMoney.sizeDelta = new Vector2(canvas.GetComponent<RectTransform>().sizeDelta.x / 2,rectMoney.sizeDelta.y);
+
+        float height = Mathf.Abs(rectCont.sizeDelta.y);
+
+        float distance = background.transform.Find("Scroll View").Find("Scrollbar Horizontal").gameObject.GetComponent<RectTransform>().offsetMin.x;
+        float offset = distance / 2;
 
         foreach (KeyValuePair<Element, ItemValues> item in elements)
         {
+
+            
             item.Value.enumElement = item.Key;
-            GameObject tmpBtn=Instantiate(buttonPreset,background.transform);
-            tmpBtn.transform.position = new Vector2(tmpBtn.transform.position.x +(tmpBtn.GetComponent<RectTransform>().rect.width* space),tmpBtn.transform.position.y);
+            GameObject tmpBtn=Instantiate(buttonPreset,content.transform);
+
+            RectTransform rectBtn = tmpBtn.GetComponent<RectTransform>();
+            rectBtn.sizeDelta = new Vector2(rectBtn.sizeDelta.x, height);
+
+            tmpBtn.transform.position = new Vector2(distance, tmpBtn.transform.position.y);//Position
+            distance += rectBtn.sizeDelta.x+offset;
+
+            rectCont.sizeDelta = new Vector2(distance,rectCont.sizeDelta.y);
 
             ButtonController tmpControl = tmpBtn.GetComponent<ButtonController>();
             tmpControl.setValues(item.Value.getImg(), item.Value.getPrice(), item.Key);
-            space += 1.2f;
         }
 
 
+    }
+
+    public bool placedStructure()
+    {
+        if(money>= elements[type].getPrice())
+        {
+            money -= elements[type].getPrice();
+            moneyText.text = "Money: $" + money;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+
+    public void soldStructure(Element e)
+    {
+        money += elements[e].getPrice();
+        moneyText.text = "Money: $" + money;
     }
 
     public Element getType()

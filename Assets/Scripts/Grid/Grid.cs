@@ -82,6 +82,10 @@ public class Grid : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
+            if (!InvManager.instance.placedStructure())
+            {
+                return;
+            }
             string path = InvManager.instance.elements[InvManager.instance.getType()].getPath();
             Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
         }
@@ -93,6 +97,7 @@ public class Grid : MonoBehaviour {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
             if (hit.collider.tag != "Grid") {
+                //InvManager.instance.soldStructure(hit.collider.GetComponent<>);
                 Destroy(hit.collider.gameObject);
             }
         }
