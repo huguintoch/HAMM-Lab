@@ -11,13 +11,17 @@ public class Grid : MonoBehaviour {
     [SerializeField]
     private GameObject cameraContainer = null;
 
-    private GameObject cubePrefab;
+    private GameObject cubePrefab,
+                       goalPrefab,
+                       spawnPrefab;
     private Camera mainCamera;
     private int offset;
 
     private void Start() {
         // Definition of attributes
         cubePrefab = (GameObject)Resources.Load("Prefabs/GridCell", typeof(GameObject));
+        goalPrefab = (GameObject)Resources.Load("Prefabs/GoalCell", typeof(GameObject));
+        spawnPrefab = (GameObject)Resources.Load("Prefabs/HamsterSpawn", typeof(GameObject));
         mainCamera = Camera.main;
         offset = gridSize + 1;
 
@@ -50,18 +54,36 @@ public class Grid : MonoBehaviour {
                 GameObject tileToSpawn = cubePrefab;
 
                 if (!goalReady && tileHeight < 0) { //Goal Tile
-                    //tileToSpawn = goalPrefab;
                     tileHeight *= -1;
+                    tileHeight++;
+                    tileToSpawn = goalPrefab;
                     goalReady = true;
-                }else if (!playerReady && tileHeight > 50) { //Player Position
-                    //*** Missing logic to spawn player with initial speed. ***
+
+                }else if (!playerReady && tileHeight > 50) { //Player Spawner
+                    Vector3 spawnPosition = Vector3.zero;
+                    Quaternion rotation = Quaternion.identity;
                     tileHeight = tileHeight - 50;
+                    //Detect in which edge will the spawner will be
+                    if (i==0) {
+                        spawnPosition = new Vector3(i - 0.5f, (tileHeight+1)*prefabHeight, j);
+                        rotation = Quaternion.Euler(0, 180, 0);
+                    }else if(i== LevelsInfo.grids[currentLevel].GetLength(0) - 1) {
+                        spawnPosition = new Vector3(i + 0.5f, (tileHeight+1)*prefabHeight, j);
+                        rotation = Quaternion.Euler(0, 0, 0);
+                    }else if (j == 0) {
+                        spawnPosition = new Vector3(i, (tileHeight + 1) * prefabHeight, j-0.5f);
+                        rotation = Quaternion.Euler(0, 90, 0);
+                    } else if(j == LevelsInfo.grids[currentLevel].GetLength(1) - 1){
+                        spawnPosition = new Vector3(i, (tileHeight + 1) * prefabHeight, j + 0.5f);
+                        rotation = Quaternion.Euler(0, -90, 0);
+                    }
+
+                    Instantiate(spawnPrefab, spawnPosition, rotation, this.transform);
                     playerReady = true;
                 }
 
-                if (tileHeight != 0) { //Spawn floor in tile;
-                    GameObject newCube = Instantiate(tileToSpawn, new Vector3(i, 0, j), Quaternion.identity, this.transform);
-                    newCube.transform.Translate(0, (tileHeight*prefabHeight) / 2, 0);
+                if (tileHeight != 0) { //Spawn tile
+                    GameObject newCube = Instantiate(tileToSpawn, new Vector3(i, (tileHeight * prefabHeight) / 2, j), Quaternion.identity, this.transform);
                     newCube.transform.localScale = new Vector3(1, tileHeight * prefabHeight, 1);
                 }
 
