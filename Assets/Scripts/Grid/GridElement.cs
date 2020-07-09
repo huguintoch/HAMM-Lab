@@ -4,7 +4,15 @@ using UnityEngine;
 
 public class GridElement : MonoBehaviour {
 
+    private Element type;
+    public Element Type {
+        get { return type; }
+        set { type = value; }
+    }
     // protected GameObject objectPrefab;
+    public GridElement() {
+        type = Element.Grid;
+    }
 
     public virtual void Start() {
         // objectPrefab = (GameObject)Resources.Load("Prefabs/Object", typeof(GameObject));

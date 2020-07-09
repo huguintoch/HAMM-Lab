@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Treadmill : GridElement {
     public override void Start() {
+        this.Type = Element.Treadmill;
         //base.Start();
     }
 

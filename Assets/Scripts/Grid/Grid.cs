@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 public class Grid : MonoBehaviour {
@@ -104,11 +103,11 @@ public class Grid : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
-            if (!InvManager.instance.placedStructure())
+            if (!InvManager.instance.PlacedStructure())
             {
                 return;
             }
-            string path = InvManager.instance.elements[InvManager.instance.getType()].getPath();
+            string path = InvManager.instance.elements[InvManager.instance.Type].Location;
             Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
         }
     }
@@ -119,7 +118,10 @@ public class Grid : MonoBehaviour {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
             if (hit.collider.tag != "Grid") {
-                //InvManager.instance.soldStructure(hit.collider.GetComponent<>);
+                GridElement hitElement = hit.collider.GetComponent<GridElement>();
+                if (hitElement != null) {
+                    InvManager.instance.SoldStructure(hitElement.Type);
+                }
                 Destroy(hit.collider.gameObject);
             }
         }

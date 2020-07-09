@@ -12,16 +12,20 @@ public class InvManager : MonoBehaviour {
     [SerializeField]
     private float money = 0f;
     [SerializeField]
-    private ItemValues[] objectDeclaration;
+    private ItemValues[] objectDeclaration=null;
 
     //Selected element
     private Element type;
+    public Element Type {
+        get { return type; }
+        set { type = value; }
+    }
 
     //GUI
     private GameObject buttonPreset, background, content, moneyPanel;
     private TextMeshProUGUI moneyText;
-    private RectTransform rectBg;
-    private Canvas canvas;
+    //private RectTransform rectBg;
+    //private Canvas canvas;
 
 
 
@@ -39,12 +43,13 @@ public class InvManager : MonoBehaviour {
         type = Element.Hamster;
 
         //Get references for the GUI elements
-        canvas = GameObject.FindObjectOfType<Canvas>();
-        background = Instantiate((GameObject)Resources.Load("Prefabs/GUI/InvBackground", typeof(GameObject)), canvas.transform);
+        //canvas = GameObject.FindObjectOfType<Canvas>();
+        background = transform.Find("InvBackground").gameObject;
         content = background.transform.Find("Scroll View").Find("Viewport").Find("Content").gameObject;
         buttonPreset = (GameObject)Resources.Load("Prefabs/GUI/InvItem", typeof(GameObject));
-        moneyPanel = Instantiate((GameObject)Resources.Load("Prefabs/GUI/MoneySign", typeof(GameObject)), canvas.transform);
-        rectBg = background.GetComponent<RectTransform>();
+
+        //Money panel initialization
+        moneyPanel = transform.Find("MoneySign").gameObject;
         moneyText = moneyPanel.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>();
         moneyText.text = "Money: $" + money;
 
@@ -56,63 +61,56 @@ public class InvManager : MonoBehaviour {
     }
 
 
-    //Declares values from the inspector
-    private void DeclareObjects() {
-        foreach (ItemValues overwrite in objectDeclaration) {
-            //Condition to remove an element from the inventory
-            if (overwrite.getPrice() < 0) {
-                elements.Remove(overwrite.enumElement);
-            } else {
-                elements[overwrite.enumElement].setPrice(overwrite.getPrice());
-            }
-        }
-    }
-
     private void InitializeDictionary() {
         elements.Add(Element.Hamster, new ItemValues("Prefabs/Hamster", "Images/GUI/Icon03"));
         elements.Add(Element.Treadmill, new ItemValues("Prefabs/Treadmill Model/Treadmill", "Images/GUI/Icon04"));
         elements.Add(Element.Trampoline, new ItemValues("Prefabs/Trampoline/Trampoline", "Images/GUI/Icon05"));
     }
 
-    //Creates buttons for each declared element and assigns size to all GUI components
+    //Declares values from the inspector
+    private void DeclareObjects() {
+        foreach (ItemValues overwrite in objectDeclaration) {
+            
+            if (!elements.ContainsKey(overwrite.EnumElement)) {
+                return;
+            }
+
+            if (overwrite.Price < 0) {//Condition to remove an element from the inventory
+                elements.Remove(overwrite.EnumElement);
+            } else {
+                elements[overwrite.EnumElement].Price = overwrite.Price;
+            }
+        }
+    }
+
+    //Creates buttons and initializes them
     private void InitializeGUI() {
-        rectBg.sizeDelta = new Vector2(rectBg.sizeDelta.x, canvas.GetComponent<RectTransform>().sizeDelta.y / 5);
 
         RectTransform rectCont = content.GetComponent<RectTransform>();
-        rectCont.sizeDelta = new Vector2(rectCont.sizeDelta.x, rectBg.sizeDelta.y * 0.6f);
 
-        RectTransform rectMoney = moneyPanel.GetComponent<RectTransform>();
-        rectMoney.sizeDelta = new Vector2(canvas.GetComponent<RectTransform>().sizeDelta.x / 2, rectMoney.sizeDelta.y);
-
-        float height = Mathf.Abs(rectCont.sizeDelta.y);
-
-        float distance = background.transform.Find("Scroll View").Find("Scrollbar Horizontal").gameObject.GetComponent<RectTransform>().offsetMin.x;
-        float offset = distance / 2;
+        float distance = 0f;
 
         foreach (KeyValuePair<Element, ItemValues> item in elements) {
-
-
-            item.Value.enumElement = item.Key;
+            item.Value.EnumElement = item.Key;
             GameObject tmpBtn = Instantiate(buttonPreset, content.transform);
 
             RectTransform rectBtn = tmpBtn.GetComponent<RectTransform>();
-            rectBtn.sizeDelta = new Vector2(rectBtn.sizeDelta.x, height);
 
-            tmpBtn.transform.position = new Vector2(distance, tmpBtn.transform.position.y);//Position
-            distance += rectBtn.sizeDelta.x + offset;
+            rectBtn.anchoredPosition= new Vector2(distance, 0f);
+            distance +=rectBtn.sizeDelta.x+(rectBtn.sizeDelta.x/6f);
 
             rectCont.sizeDelta = new Vector2(distance, rectCont.sizeDelta.y);
 
             ButtonController tmpControl = tmpBtn.GetComponent<ButtonController>();
-            tmpControl.setValues(item.Value.getImg(), item.Value.getPrice(), item.Key);
+            tmpControl.SetValues(item.Value.Img, item.Value.Price, item.Key);
         }
 
 
     }
 
-    public bool placedStructure() {
-        if (money >= elements[type].getPrice()) {
-            money -= elements[type].getPrice();
+    public bool PlacedStructure() {
+        if (money >= elements[type].Price) {
+            money -= elements[type].Price;
             moneyText.text = "Money: $" + money;
             return true;
         } else {
@@ -121,16 +119,8 @@ public class InvManager : MonoBehaviour {
 
     }
 
-    public void soldStructure(Element e) {
-        money += elements[e].getPrice();
+    public void SoldStructure(Element e) {
+        money += elements[e].Price;
         moneyText.text = "Money: $" + money;
-    }
-
-    public Element getType() {
-        return this.type;
-    }
-
-    public void setType(Element type) {
-        this.type = type;
     }
 }

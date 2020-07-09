@@ -12,14 +12,14 @@ public class ButtonController : MonoBehaviour {
 
     private Element type;
 
-    public void setValues(string img, float price, Element type) {
+    public void SetValues(string img, float price, Element type) {
         this.img.sprite = (Sprite)Resources.Load(img, typeof(Sprite));
         this.price.text = "$" + price;
         this.type = type;
     }
 
 
-    public void action() {
-        InvManager.instance.setType(type);
+    public void Action() {
+        InvManager.instance.Type=type;
     }
 }

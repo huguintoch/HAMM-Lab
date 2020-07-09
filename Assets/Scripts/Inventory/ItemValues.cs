@@ -5,30 +5,34 @@ using System;
 [Serializable]
 public class ItemValues {
 
-    public Element enumElement;
-    public float price;
+    [SerializeField]
+    private Element enumElement;
+    public Element EnumElement {
+        get { return enumElement; }
+        set { enumElement = value; }
+    }
+
+    [SerializeField]
+    private float price;
+    public float Price {
+        get { return price; }
+        set { price = value; }
+    }
+
     private string location;
+    public string Location {
+        get { return location; }
+    }
+
     private string img;
+    public string Img {
+        get { return img; }
+    }
+
 
     public ItemValues(string path, string img) {
         this.location = path;
         this.img = img;
         this.price = 0.0f;
-    }
-
-    public string getPath() {
-        return this.location;
-    }
-
-    public string getImg() {
-        return this.img;
-    }
-
-    public float getPrice() {
-        return this.price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
     }
 }

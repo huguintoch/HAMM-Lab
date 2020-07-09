@@ -19,7 +19,7 @@ public class InventoryEditor : PropertyDrawer
 
         dropDownElements = property.FindPropertyRelative("enumElement");
         price = property.FindPropertyRelative("price");
-        //GUI.Label(position,label);
+        //GUI.Label(position,label)
         EditorGUI.PropertyField(drop, dropDownElements, GUIContent.none);
         EditorGUI.LabelField(priceLabel, "Price");
         EditorGUI.PropertyField(priceRec, price, GUIContent.none);
