@@ -62,7 +62,10 @@ public class PlayerManager : MonoBehaviour {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
             if (hit.collider.tag != "Grid") {
-                //InvManager.instance.soldStructure(hit.collider.GetComponent<>);
+                GridElement hitElement = hit.collider.GetComponent<GridElement>();
+                if (hitElement != null) {
+                    InvManager.instance.SoldStructure(hitElement.Type);
+                }
                 Destroy(hit.collider.gameObject);
             }
         }
