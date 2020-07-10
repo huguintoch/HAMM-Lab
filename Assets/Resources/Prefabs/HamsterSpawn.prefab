@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1475813237725218262}
   m_Layer: 0
   m_Name: Cylinder
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1141,7 +1141,7 @@ GameObject:
   - component: {fileID: 1475813237864511705}
   m_Layer: 0
   m_Name: Outer
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5601,7 +5601,7 @@ GameObject:
   - component: {fileID: 1475813238708141109}
   m_Layer: 0
   m_Name: Inner
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10057,7 +10057,7 @@ GameObject:
   - component: {fileID: 1475813238981867626}
   m_Layer: 0
   m_Name: HamsterSpawn
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10089,7 +10089,7 @@ GameObject:
   - component: {fileID: 1475813238982454563}
   m_Layer: 0
   m_Name: Torus
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
