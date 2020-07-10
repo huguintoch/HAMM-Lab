@@ -22,4 +22,5 @@ public class ButtonController : MonoBehaviour {
     public void Action() {
         InvManager.instance.Type=type;
     }
+
 }

@@ -32,11 +32,11 @@ public class Grid : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetMouseButtonDown(0)) {
+        /*if (Input.GetMouseButtonDown(0)) {
             AddGridElement();
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
-        }
+        }*/
     }
 
     // Method to build the grid on which elements are placed
@@ -98,33 +98,34 @@ public class Grid : MonoBehaviour {
         mainCamera.transform.rotation = Quaternion.Euler(25, 225, 0);
     }
 
-    // Method to dinamically place element on grid depending on type selected
-    private void AddGridElement() {
-        RaycastHit hit;
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit)) {
-            if (!InvManager.instance.PlacedStructure())
-            {
-                return;
-            }
-            string path = InvManager.instance.elements[InvManager.instance.Type].Location;
-            Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
-        }
-    }
+    
+    //// Method to dinamically place element on grid depending on type selected
+    //private void AddGridElement() {
+    //    RaycastHit hit;
+    //    Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+    //    if (Physics.Raycast(ray, out hit)) {
+    //        if (!InvManager.instance.PlacedStructure())
+    //        {
+    //            return;
+    //        }
+    //        string path = InvManager.instance.elements[InvManager.instance.Type].Location;
+    //        Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), hit.transform.position + hit.normal, Quaternion.identity);
+    //    }
+    //}
 
-    // Method to remove element from grid by rigth cliking it
-    private void RemoveGridElement() {
-        RaycastHit hit;
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit)) {
-            if (hit.collider.tag != "Grid") {
-                GridElement hitElement = hit.collider.GetComponent<GridElement>();
-                if (hitElement != null) {
-                    InvManager.instance.SoldStructure(hitElement.Type);
-                }
-                Destroy(hit.collider.gameObject);
-            }
-        }
-    }
+    //// Method to remove element from grid by rigth cliking it
+    //private void RemoveGridElement() {
+    //    RaycastHit hit;
+    //    Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+    //    if (Physics.Raycast(ray, out hit)) {
+    //        if (hit.collider.tag != "Grid") {
+    //            GridElement hitElement = hit.collider.GetComponent<GridElement>();
+    //            if (hitElement != null) {
+    //                InvManager.instance.SoldStructure(hitElement.Type);
+    //            }
+    //            Destroy(hit.collider.gameObject);
+    //        }
+    //    }
+    //}
 
 }
