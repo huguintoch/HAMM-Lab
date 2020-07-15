@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ButtonController : MonoBehaviour {
+public class ButtonController : MonoBehaviour, IPointerDownHandler {
     [SerializeField]
     private Image img = null;
     [SerializeField]
@@ -18,9 +19,7 @@ public class ButtonController : MonoBehaviour {
         this.type = type;
     }
 
-
-    public void Action() {
-        InvManager.instance.Type=type;
+    public void OnPointerDown(PointerEventData eventData) {
+        InvManager.instance.Type = type;
     }
-
 }

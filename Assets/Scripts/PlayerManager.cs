@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -27,8 +28,9 @@ public class PlayerManager : MonoBehaviour {
     void Update() {
         
         if (elementToAdd != null) {
-            elementToAdd.transform.position = GetMouseAsWorldPoint();
+            elementToAdd.transform.position = GetTargetPosition();
         }
+
         if (Input.GetMouseButtonDown(0)) {
             AddGridElement();
         } else if (Input.GetMouseButtonUp(0)) {
@@ -36,6 +38,7 @@ public class PlayerManager : MonoBehaviour {
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
         }
+
     }
 
     public void AddGridElement() {
@@ -44,6 +47,7 @@ public class PlayerManager : MonoBehaviour {
         }
         string path = InvManager.instance.elements[InvManager.instance.Type].Location;
         elementToAdd = Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), GetMouseAsWorldPoint(), Quaternion.identity);
+        elementToAdd.GetComponent<Collider>().enabled = false;
     }
 
     // Method to dinamically place element on grid depending on type selected
@@ -51,8 +55,14 @@ public class PlayerManager : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
-            elementToAdd.transform.position = hit.transform.position + hit.normal;
-            elementToAdd = null;
+            if (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster) {
+                elementToAdd.transform.position = hit.transform.position + hit.normal;
+                elementToAdd.GetComponent<Collider>().enabled = true;
+                elementToAdd = null;
+            } else {
+                Destroy(elementToAdd);
+                elementToAdd = null;
+            }
         }
     }
 
@@ -75,6 +85,22 @@ public class PlayerManager : MonoBehaviour {
         Vector3 mInput = Input.mousePosition;
         mInput.z = 10;
         return mainCamera.ScreenToWorldPoint(mInput);
+    }
+
+    private Vector3 GetTargetPosition() {
+        RaycastHit hit;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit) && hit.collider.tag == "Grid") {
+            return hit.transform.position + hit.normal;
+        } else {
+            return GetMouseAsWorldPoint();
+        }
+    }
+
+    private bool IsGridPos() {
+        RaycastHit hit;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        return Physics.Raycast(ray, out hit) && hit.collider.tag == "Grid"; 
     }
 
 }

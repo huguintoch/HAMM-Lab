@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5805343198687201029}
   - component: {fileID: 8926783970906924245}
   - component: {fileID: 6182458222886713044}
-  - component: {fileID: 4063512101251325335}
   m_Layer: 0
   m_Name: Pipes
   m_TagString: Untagged
@@ -1572,17 +1571,3 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!64 &4063512101251325335
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766958560272938929}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
