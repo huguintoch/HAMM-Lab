@@ -17,8 +17,8 @@ public class Trampoline : GridElement
 
     private void OnCollisionEnter(Collision collision) {
         if (collision.collider.tag.Equals("Player")) {
-            Vector3 direction = collision.collider.transform.position - transform.position;
-            if (direction.y > 0.95) {
+            Vector3 direction = collision.transform.position - transform.position;
+            if (direction.y > 0.45) {
                 Vector3 jumpForce = new Vector3(0, 150, 0);
                 collision.collider.GetComponent<Rigidbody>().AddForce(jumpForce);
             }
