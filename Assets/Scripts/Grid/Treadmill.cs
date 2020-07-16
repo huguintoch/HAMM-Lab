@@ -14,7 +14,8 @@ public class Treadmill : GridElement {
 
     private void OnCollisionStay(Collision collision) {
         if (!collision.collider.tag.Equals("Grid")) {
-            collision.collider.transform.Translate(Vector3.right * Time.deltaTime, Space.World);
+            collision.collider.GetComponent<Rigidbody>().velocity = Vector3.right * 80 * Time.deltaTime;
+            //collision.collider.GetComponent<Rigidbody>().AddForce(Vector3.right*20 * Time.deltaTime);
         }
     }
 

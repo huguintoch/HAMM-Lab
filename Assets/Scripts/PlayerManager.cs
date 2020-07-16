@@ -54,7 +54,8 @@ public class PlayerManager : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster)) {
-            elementToAdd.transform.position = hit.transform.position + hit.normal;
+            float floorHeight = 0.75f;
+            elementToAdd.transform.position = hit.transform.position + hit.normal*floorHeight ;
             elementToAdd.GetComponent<Collider>().enabled = true;
         } else {
             Destroy(elementToAdd);
