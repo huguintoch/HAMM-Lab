@@ -1,27 +1,33 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour {
 
-    [SerializeField]
-    private float dragSpeed = 1;
+    [Header("Zoom Settings")]
     [SerializeField]
     private float minZoom = 1;
     [SerializeField]
     private float maxZoom = 10;
+    [SerializeField]
+    private float zoomSpeed = 5;
+    
+    [Header("Swipe Settings")]
+    [SerializeField]
+    private float minDistanceForSwipe = 20f;
 
     private Camera cam;
-    private Vector2 dragOrigin;
-
-    private bool dragging;
+    private Vector2 fingerDown;
+    private Vector2 fingerUp;
+    private Vector3 newRotation;
+    private bool isRotating = false;
 
     private void Start() {
         cam = Camera.main;
     }
 
     private void Update() {
-        
         if (Input.touchCount == 2) {
             Touch touch1 = Input.GetTouch(0);
             Touch touch2 = Input.GetTouch(1);
@@ -35,28 +41,62 @@ public class CameraMovement : MonoBehaviour {
             float difference = currentMagnitude - prevMagnitude;
             Zoom(difference * 0.01f);
         } else {
-            if (Input.GetMouseButtonDown(0)) {
-                dragOrigin = (Application.isEditor) ? Input.mousePosition : (Vector3)Input.GetTouch(0).position;
-                dragging = true;
-            }
-
-            if (dragging && Input.GetMouseButton(0)) {
-                Vector3 pos;
-                if (Application.isEditor) {
-                    pos = Camera.main.ScreenToViewportPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y) - dragOrigin);
-                } else {
-                    pos = Camera.main.ScreenToViewportPoint(Input.GetTouch(0).position - dragOrigin);
+            if (!isRotating) {
+                if (Input.GetMouseButtonDown(0)) {
+                    RotatePlatform(-1);
                 }
-                Vector3 dir = new Vector3(0, pos.x, 0).normalized;
-                transform.Rotate(new Vector3(0, dir.y, 0) * dragSpeed);
+                foreach (Touch touch in Input.touches) {
+                    if (touch.phase == TouchPhase.Began) {
+                        fingerUp = touch.position;
+                        fingerDown = touch.position;
+                    }
+                    if (touch.phase == TouchPhase.Ended) {
+                        fingerDown = touch.position;
+                        Swipe();
+                    }
+                }
+            } else {
+                if (!CompareVectors(transform.rotation.eulerAngles, newRotation)) {
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(newRotation), Time.deltaTime * 15);
+                } else {
+                    isRotating = false;
+                }
             }
         }
-
         Zoom(Input.GetAxis("Mouse ScrollWheel"));
     }
 
-    private void Zoom(float increment) {
-        // TODO: Use Translate instead
-        cam.transform.position = cam.transform.position + cam.transform.forward * increment * 5;
+    private void Swipe() {
+        float movement = Mathf.Abs(fingerDown.x - fingerUp.x);
+        if (movement > minDistanceForSwipe) {
+            var direction = fingerDown.x - fingerUp.x > 0 ? 1 : -1;
+            newRotation = transform.rotation.eulerAngles + new Vector3(0, 90 * direction, 0);
+            isRotating = true;
+            print(isRotating);
+            fingerUp = fingerDown;
+        }
+    }
+
+    private void RotatePlatform(float direction) {
+        newRotation = transform.rotation.eulerAngles + new Vector3(0, 90 * direction, 0);
+        isRotating = true;
+    }
+
+    private void Zoom(float direction) {
+        //TODO: Clamp zoom;
+        cam.transform.Translate(cam.transform.forward * direction * zoomSpeed, Space.World);
+    }
+
+    private bool CompareVectors(Vector3 A, Vector3 B) {
+        return Mathf.Abs(ConvertToPositiveAngle(A.x) - ConvertToPositiveAngle(B.x)) < 0.1 &&
+               Mathf.Abs(ConvertToPositiveAngle(A.y) - ConvertToPositiveAngle(B.y)) < 0.1 &&
+               Mathf.Abs(ConvertToPositiveAngle(A.z) - ConvertToPositiveAngle(B.z)) < 0.1;
+    }
+
+    private float ConvertToPositiveAngle(float angle) {
+        while (angle < 0) { 
+            angle += 360.0f;
+        }
+        return angle;
     }
 }
