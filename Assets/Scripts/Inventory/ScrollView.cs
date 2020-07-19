@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ScrollView : MonoBehaviour
-{
-    private void OnMouseEnter() {
-        Debug.Log("Mouse is over GameObject.");
+public class ScrollView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+    public void OnPointerEnter(PointerEventData eventData) {
         gameObject.GetComponent<ScrollRect>().enabled = true;
     }
 
-    private void OnMouseOver() {
-        Debug.Log("Mouse is out GameObject.");
+    public void OnPointerExit(PointerEventData eventData) {
         gameObject.GetComponent<ScrollRect>().enabled = false;
     }
+
 }
