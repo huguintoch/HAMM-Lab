@@ -21,7 +21,6 @@ public class CameraMovement : MonoBehaviour {
     private Vector2 fingerDown;
     private Vector2 fingerUp;
     private Vector3 newRotation;
-    private bool isRotating = false;
 
     private void Start() {
         cam = Camera.main;
@@ -41,25 +40,14 @@ public class CameraMovement : MonoBehaviour {
             float difference = currentMagnitude - prevMagnitude;
             Zoom(difference * 0.01f);
         } else {
-            if (!isRotating) {
-                if (Input.GetMouseButtonDown(0)) {
-                    RotatePlatform(-1);
+            foreach (Touch touch in Input.touches) {
+                if (touch.phase == TouchPhase.Began) {
+                    fingerUp = touch.position;
+                    fingerDown = touch.position;
                 }
-                foreach (Touch touch in Input.touches) {
-                    if (touch.phase == TouchPhase.Began) {
-                        fingerUp = touch.position;
-                        fingerDown = touch.position;
-                    }
-                    if (touch.phase == TouchPhase.Ended) {
-                        fingerDown = touch.position;
-                        Swipe();
-                    }
-                }
-            } else {
-                if (!CompareVectors(transform.rotation.eulerAngles, newRotation)) {
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(newRotation), Time.deltaTime * 15);
-                } else {
-                    isRotating = false;
+                if (touch.phase == TouchPhase.Ended) {
+                    fingerDown = touch.position;
+                    Swipe();
                 }
             }
         }
@@ -70,33 +58,13 @@ public class CameraMovement : MonoBehaviour {
         float movement = Mathf.Abs(fingerDown.x - fingerUp.x);
         if (movement > minDistanceForSwipe) {
             var direction = fingerDown.x - fingerUp.x > 0 ? 1 : -1;
-            newRotation = transform.rotation.eulerAngles + new Vector3(0, 90 * direction, 0);
-            isRotating = true;
-            print(isRotating);
+            transform.Rotate(new Vector3(0, 90 * direction, 0));
             fingerUp = fingerDown;
         }
-    }
-
-    private void RotatePlatform(float direction) {
-        newRotation = transform.rotation.eulerAngles + new Vector3(0, 90 * direction, 0);
-        isRotating = true;
     }
 
     private void Zoom(float direction) {
         //TODO: Clamp zoom;
         cam.transform.Translate(cam.transform.forward * direction * zoomSpeed, Space.World);
-    }
-
-    private bool CompareVectors(Vector3 A, Vector3 B) {
-        return Mathf.Abs(ConvertToPositiveAngle(A.x) - ConvertToPositiveAngle(B.x)) < 0.1 &&
-               Mathf.Abs(ConvertToPositiveAngle(A.y) - ConvertToPositiveAngle(B.y)) < 0.1 &&
-               Mathf.Abs(ConvertToPositiveAngle(A.z) - ConvertToPositiveAngle(B.z)) < 0.1;
-    }
-
-    private float ConvertToPositiveAngle(float angle) {
-        while (angle < 0) { 
-            angle += 360.0f;
-        }
-        return angle;
     }
 }
