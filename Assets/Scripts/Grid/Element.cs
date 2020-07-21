@@ -2,5 +2,5 @@
     Grid,
     Hamster,
     Treadmill,
-    Trampoline
+    Trampoline,
 }

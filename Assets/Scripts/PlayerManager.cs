@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour {
     public static PlayerManager instance;
     private Camera mainCamera;
     private GameObject elementToAdd;
+    public bool DragFromInventory { get; set; }
 
     private void Awake() {
         if (instance == null) {
@@ -22,22 +23,21 @@ public class PlayerManager : MonoBehaviour {
     void Start() {
         mainCamera = Camera.main;
         elementToAdd = null;
+        DragFromInventory = false;
     }
 
     // Update is called once per frame
     void Update() {
-        
         if (elementToAdd != null) {
-            elementToAdd.transform.position = GetTargetPosition();
+            elementToAdd.transform.position = GetTargetPosition().Position;
         }
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0) && (GetTargetPosition().IsGrid || DragFromInventory)) {
             AddGridElement();
         } else if (Input.GetMouseButtonUp(0)) {
             SetGridElement();
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
         }
-
     }
 
     public void AddGridElement() {
@@ -53,7 +53,7 @@ public class PlayerManager : MonoBehaviour {
     public void SetGridElement() {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster)) {
+        if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster) && elementToAdd != null) {
             float floorHeight = 0.75f;
             elementToAdd.transform.position = hit.transform.position + hit.normal*floorHeight ;
             elementToAdd.GetComponent<Collider>().enabled = true;
@@ -84,13 +84,13 @@ public class PlayerManager : MonoBehaviour {
         return mainCamera.ScreenToWorldPoint(mInput);
     }
 
-    private Vector3 GetTargetPosition() {
+    private TargetPosition GetTargetPosition() {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit) && hit.collider.tag == "Grid") {
-            return hit.transform.position + hit.normal;
+            return new TargetPosition(hit.transform.position + hit.normal, true);
         } else {
-            return GetMouseAsWorldPoint();
+            return new TargetPosition(GetMouseAsWorldPoint(), false);
         }
     }
 
