@@ -20,13 +20,13 @@ public class CameraMovement : MonoBehaviour {
     private Camera cam;
     private Vector2 fingerDown;
     private Vector2 fingerUp;
-    private Vector3 newRotation;
 
     private void Start() {
         cam = Camera.main;
     }
 
     private void Update() {
+        // Only works on mobile devices
         if (Input.touchCount == 2) {
             Touch touch1 = Input.GetTouch(0);
             Touch touch2 = Input.GetTouch(1);
@@ -46,25 +46,78 @@ public class CameraMovement : MonoBehaviour {
                     fingerDown = touch.position;
                 }
                 if (touch.phase == TouchPhase.Ended) {
-                    fingerDown = touch.position;
+                    fingerUp = touch.position;
                     Swipe();
                 }
             }
         }
-        Zoom(Input.GetAxis("Mouse ScrollWheel"));
+
+        // Only works in the Unity editor
+        if (Application.isEditor) {
+            if (Input.GetMouseButtonDown(0)) {
+                StartCoroutine(RotatePlatform(transform.rotation, 1));
+            } else if (Input.GetMouseButtonDown(1)) {
+                StartCoroutine(RotatePlatform(transform.rotation, -1));
+            }
+            Zoom(Input.GetAxis("Mouse ScrollWheel"));
+        }
     }
 
     private void Swipe() {
-        float movement = Mathf.Abs(fingerDown.x - fingerUp.x);
+        float movement = Mathf.Abs(fingerUp.x - fingerDown.x);
         if (movement > minDistanceForSwipe) {
-            var direction = fingerDown.x - fingerUp.x > 0 ? 1 : -1;
-            transform.Rotate(new Vector3(0, 90 * direction, 0));
-            fingerUp = fingerDown;
+            int direction = fingerUp.x - fingerDown.x < 0? -1: 1;
+            StopAllCoroutines();
+            StartCoroutine(RotatePlatform(transform.rotation, direction));
+            fingerDown = fingerUp;
         }
     }
 
     private void Zoom(float direction) {
         //TODO: Clamp zoom;
         cam.transform.Translate(cam.transform.forward * direction * zoomSpeed, Space.World);
+    }
+
+    private IEnumerator RotatePlatform(Quaternion startRotation, int direction) {
+        Vector3 targetVector = Vector3.zero;
+        int quadrant = ((int)startRotation.eulerAngles.y / 90) % 4 + 1;
+        switch (quadrant) {
+            case 1:
+                if ((int)startRotation.eulerAngles.y % 90 == 0) {
+                    targetVector = direction < 0 ? new Vector3(0, 270, 0) : new Vector3(0, 90, 0);
+                } else {
+                    targetVector = direction < 0 ? new Vector3(0, 0, 0) : new Vector3(0, 90, 0);
+                }
+                break;
+            case 2:
+                if ((int)startRotation.eulerAngles.y % 90 == 0) {
+                    targetVector = direction < 0 ? new Vector3(0, 0, 0) : new Vector3(0, 180, 0);
+                } else {
+                    targetVector = direction < 0 ? new Vector3(0, 90, 0) : new Vector3(0, 180, 0);
+                }
+                break;
+            case 3:
+                if ((int)startRotation.eulerAngles.y % 90 == 0) {
+                    targetVector = direction < 0 ? new Vector3(0, 90, 0) : new Vector3(0, 270, 0);
+                } else {
+                    targetVector = direction < 0 ? new Vector3(0, 180, 0) : new Vector3(0, 270, 0);
+                }
+                break;
+            case 4:
+                if ((int)startRotation.eulerAngles.y % 90 == 0) {
+                    targetVector = direction < 0 ? new Vector3(0, 180, 0) : new Vector3(0, 360, 0);
+                } else {
+                    targetVector = direction < 0 ? new Vector3(0, 270, 0) : new Vector3(0, 360, 0);
+                }
+                break;
+            default:
+                break;
+        }
+        float cont = 0;
+        while (cont <= 2) {
+            transform.rotation = Quaternion.Lerp(startRotation, Quaternion.Euler(targetVector), cont);
+            cont += Time.fixedDeltaTime*4;
+            yield return new WaitForFixedUpdate();
+        }
     }
 }
