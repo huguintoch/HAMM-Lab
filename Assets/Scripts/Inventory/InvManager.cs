@@ -24,8 +24,12 @@ public class InvManager : MonoBehaviour {
     //GUI
     private GameObject buttonPreset, background, content, moneyPanel;
     private TextMeshProUGUI moneyText;
-    //private RectTransform rectBg;
-    //private Canvas canvas;
+
+    //Button control
+    private ButtonController currentButton;
+    public ButtonController CurrentButton {
+        get { return currentButton; }
+        set { currentButton = value; } }
 
 
 
