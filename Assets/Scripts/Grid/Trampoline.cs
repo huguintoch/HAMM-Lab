@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trampoline : GridElement
-{
-    
+public class Trampoline : GridElement { 
 
     public override void Start() {
         this.Type = Element.Trampoline;
@@ -15,14 +13,16 @@ public class Trampoline : GridElement
         //base.Update();
     }
 
-    private void OnCollisionEnter(Collision collision) {
-        if (collision.collider.tag.Equals("Player")) {
-            Vector3 direction = collision.transform.position - transform.position;
+    private void OnTriggerEnter(Collider other) {
+        if (other.tag.Equals("Player")) {
+            Vector3 direction = other.transform.position - transform.position;
             if (direction.y > 0.45) {
-                Vector3 jumpForce = new Vector3(0, 200, 0);
-                collision.collider.GetComponent<Rigidbody>().AddForce(jumpForce);
+                Rigidbody rg = other.GetComponent<Rigidbody>();
+                rg.velocity = Vector3.zero;
+                Vector3 jumpForce = new Vector3(105, 250, 0);
+                other.GetComponent<Rigidbody>().AddForce(jumpForce);
             }
-            
+
         }
     }
 }
