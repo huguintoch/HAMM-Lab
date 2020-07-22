@@ -28,16 +28,24 @@ public class ButtonController : MonoBehaviour, IPointerDownHandler {
     }
 
     public void Deselect() {
-        selectLayout.SetActive(false);
+        if (selectLayout.activeSelf) {
+            selectLayout.SetActive(false);
+        }
+    }
+
+    public void Select() {
+        if (!selectLayout.activeSelf) {
+            selectLayout.SetActive(true);
+            anim.SetTrigger("Select");
+        }
+        
     }
 
     public void OnPointerDown(PointerEventData eventData) {
         if (InvManager.instance.CurrentButton != null) {
             InvManager.instance.CurrentButton.Deselect();
         }
-
-        selectLayout.SetActive(true);
-        anim.SetTrigger("Select");
+        Select();
         InvManager.instance.CurrentButton = this;
         InvManager.instance.Type = type;
     }
