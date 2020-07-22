@@ -4,20 +4,16 @@ using UnityEngine.UI;
 
 public class ScrollView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
-    private GameObject playerManager;
-
-    private void Start() {
-        playerManager = GameObject.Find("Player Manager");
-    }
+    public bool PointerOnInventory { get; private set; }
 
     public void OnPointerEnter(PointerEventData eventData) {
+        PointerOnInventory = true;
         gameObject.GetComponent<ScrollRect>().enabled = true;
-        playerManager.GetComponent<PlayerManager>().DragFromInventory = true;
     }
 
     public void OnPointerExit(PointerEventData eventData) {
+        PointerOnInventory = false;
         gameObject.GetComponent<ScrollRect>().enabled = false;
-        playerManager.GetComponent<PlayerManager>().DragFromInventory = false;
     }
 
 }

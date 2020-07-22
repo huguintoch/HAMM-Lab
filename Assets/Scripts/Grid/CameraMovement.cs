@@ -18,48 +18,54 @@ public class CameraMovement : MonoBehaviour {
     private float minDistanceForSwipe = 20f;
 
     private Camera cam;
+    private ScrollView scroller;
     private Vector2 fingerDown;
     private Vector2 fingerUp;
+    public bool Draggable { get; set; }
 
     private void Start() {
         cam = Camera.main;
+        scroller = GameObject.Find("Scroll View").GetComponent<ScrollView>();
+        Draggable = true;
     }
 
     private void Update() {
-        // Only works on mobile devices
-        if (Input.touchCount == 2) {
-            Touch touch1 = Input.GetTouch(0);
-            Touch touch2 = Input.GetTouch(1);
+        if (Draggable && !scroller.PointerOnInventory) {
+            // Only works on mobile devices
+            if (Input.touchCount == 2) {
+                Touch touch1 = Input.GetTouch(0);
+                Touch touch2 = Input.GetTouch(1);
 
-            Vector2 touch1PrevPos = touch1.position - touch1.deltaPosition;
-            Vector2 touch2PrevPos = touch2.position - touch2.deltaPosition;
+                Vector2 touch1PrevPos = touch1.position - touch1.deltaPosition;
+                Vector2 touch2PrevPos = touch2.position - touch2.deltaPosition;
 
-            float prevMagnitude = (touch1PrevPos - touch2PrevPos).magnitude;
-            float currentMagnitude = (touch1.position - touch2.position).magnitude;
+                float prevMagnitude = (touch1PrevPos - touch2PrevPos).magnitude;
+                float currentMagnitude = (touch1.position - touch2.position).magnitude;
 
-            float difference = currentMagnitude - prevMagnitude;
-            Zoom(difference * 0.01f);
-        } else {
-            foreach (Touch touch in Input.touches) {
-                if (touch.phase == TouchPhase.Began) {
-                    fingerUp = touch.position;
-                    fingerDown = touch.position;
-                }
-                if (touch.phase == TouchPhase.Ended) {
-                    fingerUp = touch.position;
-                    Swipe();
+                float difference = currentMagnitude - prevMagnitude;
+                Zoom(difference * 0.01f);
+            } else {
+                foreach (Touch touch in Input.touches) {
+                    if (touch.phase == TouchPhase.Began) {
+                        fingerUp = touch.position;
+                        fingerDown = touch.position;
+                    }
+                    if (touch.phase == TouchPhase.Ended) {
+                        fingerUp = touch.position;
+                        Swipe();
+                    }
                 }
             }
-        }
 
-        // Only works in the Unity editor
-        if (Application.isEditor) {
-            if (Input.GetMouseButtonDown(0)) {
-                StartCoroutine(RotatePlatform(transform.rotation, 1));
-            } else if (Input.GetMouseButtonDown(1)) {
-                StartCoroutine(RotatePlatform(transform.rotation, -1));
+            // Only works in the Unity editor
+            if (Application.isEditor) {
+                if (Input.GetMouseButtonDown(0)) {
+                    StartCoroutine(RotatePlatform(transform.rotation, 1));
+                } else if (Input.GetMouseButtonDown(1)) {
+                    StartCoroutine(RotatePlatform(transform.rotation, -1));
+                }
+                Zoom(Input.GetAxis("Mouse ScrollWheel"));
             }
-            Zoom(Input.GetAxis("Mouse ScrollWheel"));
         }
     }
 

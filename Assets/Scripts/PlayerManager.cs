@@ -2,14 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEditor.UI;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour {
 
     public static PlayerManager instance;
     private Camera mainCamera;
-    private GameObject elementToAdd;
-    public bool DragFromInventory { get; set; }
+    private ScrollView scroller;
+    private GameObject elementToAdd,
+                       cameraContainer;
 
     private void Awake() {
         if (instance == null) {
@@ -22,22 +24,26 @@ public class PlayerManager : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         mainCamera = Camera.main;
+        cameraContainer = GameObject.Find("Camera Container");
+        scroller = GameObject.Find("Scroll View").GetComponent<ScrollView>();
         elementToAdd = null;
-        DragFromInventory = false;
     }
 
     // Update is called once per frame
     void Update() {
+
         if (elementToAdd != null) {
             elementToAdd.transform.position = GetTargetPosition().Position;
         }
-        if (Input.GetMouseButtonDown(0) && (GetTargetPosition().IsGrid || DragFromInventory)) {
+        if (Input.GetMouseButtonDown(0) && (GetTargetPosition().IsGrid || scroller.PointerOnInventory)) {
             AddGridElement();
         } else if (Input.GetMouseButtonUp(0)) {
             SetGridElement();
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
         }
+        cameraContainer.GetComponent<CameraMovement>().Draggable = !GetTargetPosition().IsGrid;
+
     }
 
     public void AddGridElement() {
@@ -87,7 +93,7 @@ public class PlayerManager : MonoBehaviour {
     private TargetPosition GetTargetPosition() {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit) && hit.collider.tag == "Grid") {
+        if (Physics.Raycast(ray, out hit)) {
             return new TargetPosition(hit.transform.position + hit.normal, true);
         } else {
             return new TargetPosition(GetMouseAsWorldPoint(), false);
