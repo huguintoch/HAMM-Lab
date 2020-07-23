@@ -18,7 +18,7 @@ public class Grid : MonoBehaviour {
 
     private void Start() {
         // Definition of attributes
-        cubePrefab = (GameObject)Resources.Load("Prefabs/GridCell", typeof(GameObject));
+        cubePrefab = (GameObject)Resources.Load("Prefabs/GridTest", typeof(GameObject));
         goalPrefab = (GameObject)Resources.Load("Prefabs/GoalCell", typeof(GameObject));
         spawnPrefab = (GameObject)Resources.Load("Prefabs/HamsterSpawn", typeof(GameObject));
         mainCamera = Camera.main;
