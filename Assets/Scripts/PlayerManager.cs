@@ -59,8 +59,8 @@ public class PlayerManager : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster) && elementToAdd != null) {
-            float floorHeight = 0.75f;
-            elementToAdd.transform.position = hit.transform.position + hit.normal*floorHeight ;
+            float yOffset = hit.collider.bounds.size.y / 2 + 0.5f; //0.5 represents the height of object that is going to be placed.
+            elementToAdd.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y + yOffset, hit.transform.position.z);
             elementToAdd.GetComponent<Collider>().enabled = true;
         } else {
             Destroy(elementToAdd);
@@ -93,7 +93,8 @@ public class PlayerManager : MonoBehaviour {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
-            return new TargetPosition(hit.transform.position + hit.normal, true);
+            float yOffset = hit.collider.bounds.size.y / 2 + 0.5f; //0.5 represents the height of the object that is going to be placed.
+            return new TargetPosition(new Vector3(hit.transform.position.x, hit.transform.position.y + yOffset, hit.transform.position.z), true);
         } else {
             return new TargetPosition(GetMouseAsWorldPoint(), false);
         }
