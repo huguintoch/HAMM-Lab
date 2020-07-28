@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour {
 
+    [SerializeField]
+    private Material[] statusMaterial = null;
+
     public static PlayerManager instance;
     private Camera mainCamera;
+    private PointerTarget pointerTarget;
+    private Material prevMaterial;
     private ScrollView scroller;
     private GameObject elementToAdd,
                        cameraContainer;
@@ -20,48 +26,92 @@ public class PlayerManager : MonoBehaviour {
         }
     }
 
-    // Start is called before the first frame update
     void Start() {
         mainCamera = Camera.main;
         cameraContainer = GameObject.Find("Camera Container");
         scroller = GameObject.Find("Scroll View").GetComponent<ScrollView>();
         elementToAdd = null;
+        pointerTarget = new PointerTarget(new Vector3(), null);
+        prevMaterial = statusMaterial[2];
     }
 
-    // Update is called once per frame
     void Update() {
 
+        PointerTarget newTarget = GetTarget();
+
         if (elementToAdd != null) {
-            elementToAdd.transform.position = GetTargetPosition().Position;
+            DragElementToAdd();
+            SetTargetColor(newTarget);
         }
-        if (Input.GetMouseButtonDown(0) && (GetTargetPosition().IsGrid || scroller.PointerOnInventory)) {
+
+        pointerTarget = newTarget;
+        SetCameraDrag();
+
+        if (Input.GetMouseButtonDown(0) && (pointerTarget.TargetCollider != null && pointerTarget.TargetCollider.CompareTag("Grid") || scroller.PointerOnInventory)) {
             AddGridElement();
         } else if (Input.GetMouseButtonUp(0)) {
             SetGridElement();
         } else if (Input.GetMouseButtonDown(1)) {
             RemoveGridElement();
         }
-        cameraContainer.GetComponent<CameraMovement>().Draggable = !GetTargetPosition().IsGrid;
 
     }
 
-    public void AddGridElement() {
-        if (!InvManager.instance.PlacedStructure()) {
-            return;
+    private void DragElementToAdd() {
+        elementToAdd.SetActive(!scroller.PointerOnInventory);
+        elementToAdd.transform.position = pointerTarget.TargetPosition;
+    }
+
+    private void SetTargetColor(PointerTarget newTarget) {
+        if (newTarget.TargetCollider != null) {
+            if (newTarget.TargetCollider.CompareTag("Grid")) {
+                prevMaterial = statusMaterial[2];
+                newTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[0];
+            } else {
+                prevMaterial = statusMaterial[3];
+                newTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[1];
+            }
         }
+        if (pointerTarget.TargetCollider != null) {
+            if (!pointerTarget.TargetPosition.Equals(newTarget.TargetPosition)) {
+                if (pointerTarget.TargetCollider.CompareTag("Grid")) {
+                    pointerTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[2];
+                } else {
+                    pointerTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[3];
+                }
+            }
+        }
+    }
+
+    private void SetCameraDrag() {
+        if (pointerTarget.TargetCollider == null) {
+            cameraContainer.GetComponent<CameraMovement>().Draggable = true;
+        } else {
+            cameraContainer.GetComponent<CameraMovement>().Draggable = false;
+        }
+    }
+
+    public void AddGridElement() {
         string path = InvManager.instance.elements[InvManager.instance.Type].Location;
         elementToAdd = Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), GetMouseAsWorldPoint(), Quaternion.identity);
         elementToAdd.GetComponent<Collider>().enabled = false;
+        elementToAdd.SetActive(false);
     }
 
     // Method to dinamically place element on grid depending on type selected
     public void SetGridElement() {
-        RaycastHit hit;
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Grid" || InvManager.instance.Type == Element.Hamster) && elementToAdd != null) {
-            float yOffset = hit.collider.bounds.size.y / 2 + 0.5f; //0.5 represents the height of object that is going to be placed.
-            elementToAdd.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y + yOffset, hit.transform.position.z);
-            elementToAdd.GetComponent<Collider>().enabled = true;
+        if (pointerTarget.TargetCollider != null) {
+            if (pointerTarget.TargetCollider.CompareTag("Grid") && elementToAdd != null || InvManager.instance.Type == Element.Hamster) {
+                if (!InvManager.instance.PlacedStructure()) {
+                    return;
+                }
+                elementToAdd.transform.position = pointerTarget.TargetPosition;
+                elementToAdd.GetComponent<Collider>().enabled = true;
+                pointerTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[2]; // [TODO]: Remove harcode
+            } else {
+                Destroy(elementToAdd);
+                pointerTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[3]; // [TODO]: Remove harcode
+            }
         } else {
             Destroy(elementToAdd);
         }
@@ -70,16 +120,12 @@ public class PlayerManager : MonoBehaviour {
 
     // Method to remove element from grid by rigth cliking it
     public void RemoveGridElement() {
-        RaycastHit hit;
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit)) {
-            if (hit.collider.tag != "Grid") {
-                GridElement hitElement = hit.collider.GetComponent<GridElement>();
-                if (hitElement != null) {
-                    InvManager.instance.SoldStructure(hitElement.Type);
-                }
-                Destroy(hit.collider.gameObject);
+        if (pointerTarget.TargetCollider != null && !pointerTarget.TargetCollider.CompareTag("Grid")) {
+            GridElement hitElement = pointerTarget.TargetCollider.GetComponent<GridElement>();
+            if (hitElement != null) {
+                InvManager.instance.SoldStructure(hitElement.Type);
             }
+            Destroy(pointerTarget.TargetCollider);
         }
     }
 
@@ -89,14 +135,17 @@ public class PlayerManager : MonoBehaviour {
         return mainCamera.ScreenToWorldPoint(mInput);
     }
 
-    private TargetPosition GetTargetPosition() {
+    private PointerTarget GetTarget() {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit)) {
             float yOffset = hit.collider.bounds.size.y / 2 + 0.5f; //0.5 represents the height of the object that is going to be placed.
-            return new TargetPosition(new Vector3(hit.transform.position.x, hit.transform.position.y + yOffset, hit.transform.position.z), true);
+            return new PointerTarget(
+                new Vector3(hit.transform.position.x, hit.transform.position.y + yOffset, hit.transform.position.z), 
+                hit.collider.gameObject
+            );
         } else {
-            return new TargetPosition(GetMouseAsWorldPoint(), false);
+            return new PointerTarget(GetMouseAsWorldPoint(), null);
         }
     }
 
