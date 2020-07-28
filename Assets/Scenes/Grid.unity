@@ -1123,7 +1123,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1312111795}
   - component: {fileID: 1312111796}
-  - component: {fileID: 1312111797}
   m_Layer: 0
   m_Name: Player Manager
   m_TagString: Untagged
@@ -1157,26 +1156,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb2dcd534276a8489b77d302906f2ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< Updated upstream
---- !u!114 &1312111797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312111794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee03da0687872e341aa1652480eec9fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-=======
   statusMaterial:
-  - {fileID: 2100000, guid: 2474bdaccd1eca3409538f1aeb97026c, type: 2}
   - {fileID: 2100000, guid: 69f9ee1a92df09940a9a5eaf6be8e996, type: 2}
-  - {fileID: 2100000, guid: 524510f2f39551c45b0edffa5059d6be, type: 2}
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
->>>>>>> Stashed changes
+  - {fileID: 2100000, guid: 2474bdaccd1eca3409538f1aeb97026c, type: 2}
+  - {fileID: 2100000, guid: 4db8e3a608a7545479f3a99da7fcad29, type: 2}
 --- !u!1 &1494214017
 GameObject:
   m_ObjectHideFlags: 0
@@ -1524,13 +1507,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 300284687}
   m_HandleRect: {fileID: 300284686}
   m_Direction: 0
-<<<<<<< Updated upstream
-  m_Value: -0.00000018778034
-  m_Size: 0.7329707
-=======
   m_Value: 0
   m_Size: 0.6536659
->>>>>>> Stashed changes
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

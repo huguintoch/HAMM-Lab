@@ -62,27 +62,22 @@ public class PlayerManager : MonoBehaviour {
         elementToAdd.transform.position = pointerTarget.TargetPosition;
     }
 
+    // Method to change color of target position
     private void SetTargetColor(PointerTarget newTarget) {
+        // Set color of next target
         if (newTarget.TargetCollider != null) {
-            if (newTarget.TargetCollider.CompareTag("Grid")) {
-                prevMaterial = statusMaterial[2];
-                newTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[0];
-            } else {
-                prevMaterial = statusMaterial[3];
-                newTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[1];
-            }
+            int index = newTarget.TargetCollider.CompareTag("Grid") ? 1 : 0;
+            newTarget.TargetCollider.transform.Find("Fade").GetComponent<Renderer>().material = statusMaterial[index];
         }
+        // Reset color of previous target
         if (pointerTarget.TargetCollider != null) {
             if (!pointerTarget.TargetPosition.Equals(newTarget.TargetPosition)) {
-                if (pointerTarget.TargetCollider.CompareTag("Grid")) {
-                    pointerTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[2];
-                } else {
-                    pointerTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[3];
-                }
+                pointerTarget.TargetCollider.transform.Find("Fade").GetComponent<Renderer>().material = statusMaterial[2];
             }
         }
     }
 
+    // Method to enable and disable camera drag
     private void SetCameraDrag() {
         if (pointerTarget.TargetCollider == null) {
             cameraContainer.GetComponent<CameraMovement>().Draggable = true;
@@ -91,6 +86,7 @@ public class PlayerManager : MonoBehaviour {
         }
     }
 
+    // Method to instantiate grid element
     public void AddGridElement() {
         string path = InvManager.instance.elements[InvManager.instance.Type].Location;
         elementToAdd = Instantiate((GameObject)Resources.Load(path, typeof(GameObject)), GetMouseAsWorldPoint(), Quaternion.identity);
@@ -98,7 +94,7 @@ public class PlayerManager : MonoBehaviour {
         elementToAdd.SetActive(false);
     }
 
-    // Method to dinamically place element on grid depending on type selected
+    // Method to place grid element
     public void SetGridElement() {
         if (pointerTarget.TargetCollider != null) {
             if (pointerTarget.TargetCollider.CompareTag("Grid") && elementToAdd != null || InvManager.instance.Type == Element.Hamster) {
@@ -107,11 +103,11 @@ public class PlayerManager : MonoBehaviour {
                 }
                 elementToAdd.transform.position = pointerTarget.TargetPosition;
                 elementToAdd.GetComponent<Collider>().enabled = true;
-                pointerTarget.TargetCollider.transform.Find("Top").GetComponent<Renderer>().material = statusMaterial[2]; // [TODO]: Remove harcode
             } else {
                 Destroy(elementToAdd);
-                pointerTarget.TargetCollider.GetComponent<Renderer>().material = statusMaterial[3]; // [TODO]: Remove harcode
             }
+            // Delete status color
+            pointerTarget.TargetCollider.transform.Find("Fade").GetComponent<Renderer>().material = statusMaterial[2];
         } else {
             Destroy(elementToAdd);
         }
@@ -129,12 +125,14 @@ public class PlayerManager : MonoBehaviour {
         }
     }
 
+    // Method to get free pointer location
     private Vector3 GetMouseAsWorldPoint() {
         Vector3 mInput = Input.mousePosition;
         mInput.z = 10;
         return mainCamera.ScreenToWorldPoint(mInput);
     }
 
+    // Method to get either free or clamped position + reference to object hit by raycast
     private PointerTarget GetTarget() {
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
