@@ -41,7 +41,14 @@ public class ButtonController : MonoBehaviour, IPointerDownHandler {
         if (InvManager.instance.CurrentButton != null) {
             InvManager.instance.CurrentButton.Deselect();
         }
+        if(InvManager.instance.CurrentButton== this) {
+            InvManager.instance.CurrentButton = null;
+            InvManager.instance.Type = Element.Grid;
+            PlayerManager.instance.CancelSelection();
+            return;
+        }
         Select();
+
         InvManager.instance.CurrentButton = this;
         InvManager.instance.Type = type;
     }

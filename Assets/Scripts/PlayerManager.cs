@@ -36,30 +36,32 @@ public class PlayerManager : MonoBehaviour {
     }
 
     void Update() {
+  
+        //SetCameraDrag();
 
-        PointerTarget newTarget = GetTarget();
-
-        if (elementToAdd != null) {
-            DragElementToAdd();
-            SetTargetColor(newTarget);
+        if (PlayerSM.state == 1) { //User is trying to select an object.
+            AddGridElement();
+            PlayerSM.state = 2;
+        } else if (PlayerSM.state == 2) { //User is dragging the selected object.
+            PointerTarget newTarget = GetTarget();
+            DragElementToAdd(newTarget);
+            pointerTarget = newTarget;
+        } else if (PlayerSM.state == 4) { //User is trying to place the object.
+            SetGridElement(GetTarget());
+            PlayerSM.state = 0;
         }
 
-        pointerTarget = newTarget;
-        SetCameraDrag();
 
-        if (Input.GetMouseButtonDown(0) && (pointerTarget.TargetCollider != null && pointerTarget.TargetCollider.CompareTag("Grid") || scroller.PointerOnInventory)) {
-            AddGridElement();
-        } else if (Input.GetMouseButtonUp(0)) {
-            SetGridElement();
-        } else if (Input.GetMouseButtonDown(1)) {
+        if (Input.GetMouseButtonDown(1)) {//Missing logic to erase object within rotation menu.
             RemoveGridElement();
         }
 
     }
 
-    private void DragElementToAdd() {
+    private void DragElementToAdd(PointerTarget pointerTarget) {
         elementToAdd.SetActive(!scroller.PointerOnInventory);
         elementToAdd.transform.position = pointerTarget.TargetPosition;
+        SetTargetColor(pointerTarget);
     }
 
     // Method to change color of target position
@@ -94,14 +96,18 @@ public class PlayerManager : MonoBehaviour {
         elementToAdd.SetActive(false);
     }
 
-    // Method to place grid element
-    public void SetGridElement() {
-        if (pointerTarget.TargetCollider != null) {
-            if (pointerTarget.TargetCollider.CompareTag("Grid") && elementToAdd != null || InvManager.instance.Type == Element.Hamster) {
+    // Method to dinamically place element on grid depending on type selected
+    
+    public void SetGridElement(PointerTarget target) {
+        //Sometimes the input won't enter the DragElement method.
+        elementToAdd.GetComponent<Collider>().enabled = true;
+        elementToAdd.SetActive(true);
+        if (target.TargetCollider != null) {
+            if (target.TargetCollider.CompareTag("Grid") && elementToAdd != null || InvManager.instance.Type==Element.Hamster) {
                 if (!InvManager.instance.PlacedStructure()) {
                     return;
                 }
-                elementToAdd.transform.position = pointerTarget.TargetPosition;
+                elementToAdd.transform.position = target.TargetPosition;
                 elementToAdd.GetComponent<Collider>().enabled = true;
             } else {
                 Destroy(elementToAdd);
@@ -145,6 +151,14 @@ public class PlayerManager : MonoBehaviour {
         } else {
             return new PointerTarget(GetMouseAsWorldPoint(), null);
         }
+    }
+
+    ///<summary>
+    ///Called when the user deselects the current object from the inventory
+    ///</summary>
+    public void CancelSelection() {
+        Destroy(elementToAdd);
+        PlayerSM.state = 0;
     }
 
 }

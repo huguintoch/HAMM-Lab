@@ -8,7 +8,7 @@ public class InvManager : MonoBehaviour {
     public static InvManager instance;
 
     public Dictionary<Element, ItemValues> elements = new Dictionary<Element, ItemValues>();
-
+    
     [SerializeField]
     private float money = 0f;
     [SerializeField]
@@ -44,7 +44,7 @@ public class InvManager : MonoBehaviour {
 
     void Start() {
         //Default selected element
-        type = Element.Hamster;
+        type = Element.Grid;
 
         //Get references for the GUI elements
         //canvas = GameObject.FindObjectOfType<Canvas>();
@@ -66,6 +66,7 @@ public class InvManager : MonoBehaviour {
 
 
     private void InitializeDictionary() {
+        elements.Add(Element.Grid, new ItemValues(null,null));
         elements.Add(Element.Hamster, new ItemValues("Prefabs/Hamster", "Images/GUI/Icon03"));
         elements.Add(Element.Treadmill, new ItemValues("Prefabs/Treadmill Model/Treadmill", "Images/GUI/Icon04"));
         elements.Add(Element.Trampoline, new ItemValues("Prefabs/Trampoline/Trampoline", "Images/GUI/Icon05"));
@@ -95,6 +96,10 @@ public class InvManager : MonoBehaviour {
         float distance = 0f;
 
         foreach (KeyValuePair<Element, ItemValues> item in elements) {
+            
+            if (item.Key.Equals(Element.Grid)) 
+                continue;
+
             item.Value.EnumElement = item.Key;
             GameObject tmpBtn = Instantiate(buttonPreset, content.transform);
 

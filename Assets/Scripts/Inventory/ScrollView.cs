@@ -6,14 +6,19 @@ public class ScrollView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public bool PointerOnInventory { get; private set; }
 
+    private ScrollRect scrollRect;
+
+    private void Awake() {
+        scrollRect = GetComponent<ScrollRect>();
+    }
+
     public void OnPointerEnter(PointerEventData eventData) {
         PointerOnInventory = true;
-        gameObject.GetComponent<ScrollRect>().enabled = true;
+        scrollRect.enabled = true;
     }
 
     public void OnPointerExit(PointerEventData eventData) {
         PointerOnInventory = false;
-        gameObject.GetComponent<ScrollRect>().enabled = false;
+        scrollRect.enabled = false;
     }
-
 }

@@ -12,7 +12,7 @@ public class CameraMovement : MonoBehaviour {
     private float maxZoom = 10;
     [SerializeField]
     private float zoomSpeed = 5;
-    
+
     [Header("Swipe Settings")]
     [SerializeField]
     private float minDistanceForSwipe = 20f;
@@ -30,7 +30,7 @@ public class CameraMovement : MonoBehaviour {
     }
 
     private void Update() {
-        if (Draggable && !scroller.PointerOnInventory) {
+        if (true) {
             // Only works on mobile devices
             if (Input.touchCount == 2) {
                 Touch touch1 = Input.GetTouch(0);
@@ -59,8 +59,9 @@ public class CameraMovement : MonoBehaviour {
 
             // Only works in the Unity editor
             if (Application.isEditor) {
-                if (Input.GetMouseButtonDown(0)) {
+                if (PlayerSM.state == 5) {
                     StartCoroutine(RotatePlatform(transform.rotation, 1));
+                    PlayerSM.state = 0;
                 } else if (Input.GetMouseButtonDown(1)) {
                     StartCoroutine(RotatePlatform(transform.rotation, -1));
                 }
@@ -72,7 +73,7 @@ public class CameraMovement : MonoBehaviour {
     private void Swipe() {
         float movement = Mathf.Abs(fingerUp.x - fingerDown.x);
         if (movement > minDistanceForSwipe) {
-            int direction = fingerUp.x - fingerDown.x < 0? -1: 1;
+            int direction = fingerUp.x - fingerDown.x < 0 ? -1 : 1;
             StopAllCoroutines();
             StartCoroutine(RotatePlatform(transform.rotation, direction));
             fingerDown = fingerUp;
@@ -122,7 +123,7 @@ public class CameraMovement : MonoBehaviour {
         float cont = 0;
         while (cont <= 2) {
             transform.rotation = Quaternion.Lerp(startRotation, Quaternion.Euler(targetVector), cont);
-            cont += Time.fixedDeltaTime*4;
+            cont += Time.fixedDeltaTime * 4;
             yield return new WaitForFixedUpdate();
         }
     }
