@@ -68,10 +68,9 @@ public class PlayerSM : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0)) {
             if (state == 2) { //User is dragging an object.
-                PointerTarget target = GetTarget();
-                if (scroller.PointerOnInventory) {
+                if (scroller.PointerOnInventory) { //User is stil on inventory
                     state = 3;
-                } else if (target.TargetCollider == null || target.TargetCollider.tag.Equals("Grid")) {
+                } else { //User release the object outside the inventory
                     state = 4;
                 }
                 return;
@@ -83,7 +82,7 @@ public class PlayerSM : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.L)) {
-            Debug.Log(state);
+            Debug.Log(state + " " + InvManager.instance.Type);
         }
     }
 
