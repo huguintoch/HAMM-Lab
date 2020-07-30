@@ -19,9 +19,8 @@ public class ObjectRotation : MonoBehaviour
     }
 
     private void Start() {
-        
-        menuHolder.SetActive(false);
         deletionTime = anim.GetCurrentAnimatorStateInfo(0).length;
+        menuHolder.SetActive(false);
     }
 
     private void Update() {
@@ -38,7 +37,7 @@ public class ObjectRotation : MonoBehaviour
 
     private void CloseMenu() {
         anim.SetTrigger("Close");
-        menuHolder.SetActive(false);
+        Invoke("Deactivate", deletionTime);
     }
 
     public void CancelButton() {
@@ -75,5 +74,9 @@ public class ObjectRotation : MonoBehaviour
         Vector3 mInput = Input.mousePosition;
         mInput.z = 10;
         return mainCamera.ScreenToWorldPoint(mInput);
+    }
+
+    private void Deactivate() {
+        menuHolder.SetActive(false);
     }
 }
