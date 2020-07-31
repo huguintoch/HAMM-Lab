@@ -21,6 +21,7 @@ public class CameraMovement : MonoBehaviour {
     private ScrollView scroller;
     private Vector2 fingerDown;
     private Vector2 fingerUp;
+    private Vector2 lastDragPosition;
     public bool Draggable { get; set; }
 
     private void Start() {
@@ -45,20 +46,36 @@ public class CameraMovement : MonoBehaviour {
                 float difference = currentMagnitude - prevMagnitude;
                 Zoom(difference * 0.01f);
             } else {
-                foreach (Touch touch in Input.touches) {
-                    if (touch.phase == TouchPhase.Began) {
-                        fingerUp = touch.position;
-                        fingerDown = touch.position;
-                    }
-                    if (touch.phase == TouchPhase.Ended) {
-                        fingerUp = touch.position;
-                        Swipe();
-                    }
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Began) {
+                    lastDragPosition = touch.position;
                 }
+                if (touch.phase == TouchPhase.Moved) {
+                    var delta = lastDragPosition - touch.position;
+                    cam.transform.Translate(delta * Time.deltaTime, Space.Self);
+                    lastDragPosition = touch.position;
+                }
+                //foreach (Touch touch in Input.touches) {
+                //    if (touch.phase == TouchPhase.Began) {
+                //        fingerUp = touch.position;
+                //        fingerDown = touch.position;
+                //    }
+                //    if (touch.phase == TouchPhase.Ended) {
+                //        fingerUp = touch.position;
+                //        Swipe();
+                //    }
+                //}
             }
 
             // Only works in the Unity editor
             if (Application.isEditor) {
+                //if (Input.GetMouseButtonDown(2))
+                //    lastDragPosition = Input.mousePosition;
+                //if (Input.GetMouseButton(2)) {
+                //    var delta = lastDragPosition - Input.mousePosition;
+                //    cam.transform.Translate(delta * Time.deltaTime * 2, Space.Self);
+                //    lastDragPosition = Input.mousePosition;
+                //}
                 if (PlayerSM.state == 5) {
                     StartCoroutine(RotatePlatform(transform.rotation, 1));
                     PlayerSM.state = 0;
@@ -67,6 +84,7 @@ public class CameraMovement : MonoBehaviour {
                 }
                 Zoom(Input.GetAxis("Mouse ScrollWheel"));
             }
+
         }
     }
 
